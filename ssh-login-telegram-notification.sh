@@ -29,7 +29,7 @@ else
 	    IP=$(echo $SSH_CLIENT | awk '{print $1}')
 	    PORT=$(echo $SSH_CLIENT | awk '{print $3}')
 	    HOSTNAME=$(hostname -f)
-    	IPADDR=$(echo $SSH_CONNECTION | awk '{print $3}')
+    	    IPADDR=$(echo $SSH_CONNECTION | awk '{print $3}')
 
 	    sudo curl http://ipinfo.io/$IP -s -o $TMPFILE
 	    CITY=$(cat $TMPFILE | jq '.city' | sed 's/"//g')
