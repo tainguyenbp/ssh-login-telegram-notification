@@ -22,7 +22,7 @@ DATE_EXEC="$HOUR:$MUNITES:$SECOND $DAY/$MONTH/$YEAR"
 # File temp
 TMPFILE='/tmp/ipinfo.txt'
 if [ "tainguyenbp" == "$USER" ]; then
-# Add-user script not working 	
+# Add-user script and ansible not working
 	break
 else
 	if [ -n "$SSH_CLIENT" ]; then
