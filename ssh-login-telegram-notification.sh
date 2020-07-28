@@ -48,7 +48,7 @@ else
 
 	        sudo rm $TMPFILE
 	    else
-		# Define for IP local
+		# Define for IP public
 	        TEXT=$(echo -e "Date Time: $DATE_EXEC\nNew remote SSH connection.\nUser Login: ${USER} \nServer Login: $HOSTNAME ($IPADDR) \nPort Login: $PORT\nAddress: from $IP - $ORG - $CITY, $REGION, $COUNTRY")
 
 	        sudo curl -s -X POST --max-time $TIMEOUT $TELEGRAM_URL -d "chat_id=$TELEGRAM_USER_CHAT_ID" -d text="$CONTENT_MESSENGE" > /dev/null
