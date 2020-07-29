@@ -18,11 +18,15 @@ SECOND=$(date +"%S")
 
 DATE_EXEC="$HOUR:$MUNITES:$SECOND $DAY/$MONTH/$YEAR"
 
+# Foler temp
+PATH_TMPFOLDER="`pwd`/.tmp"
+mkdir -p $PATH_TMPFOLDER
 
 # File temp
-TMPFILE='/tmp/ipinfo.txt'
-if [ "tainguyenbp" == "$USER" ]; then
-# Add-user script and ansible not working
+TMPFILE="$PATH_TMPFOLDER/ipinfo.txt"
+
+if [ "tainguyenbp" == "$USER" ] || [ "nntai" == "$USER" ]; then
+# Add-user script not working
 	break
 else
 	if [ -n "$SSH_CLIENT" ]; then
@@ -44,16 +48,16 @@ else
 	        ORG="210 Cach Mang Thang 8"
 	        CONTENT_MESSENGE=$(echo -e "Date Time: $DATE_EXEC\nNew remote SSH connection.\nUser Login: ${USER} \nServer Login: $HOSTNAME ($IPADDR) \nPort Login: $PORT\nAddress: from $IP - $ORG - $CITY, $REGION, $COUNTRY")
 
-	        sudo curl -s -X POST --max-time $TIMEOUT $TELEGRAM_URL -d "chat_id=$TELEGRAM_USER_CHAT_ID" -d text="$CONTENT_MESSENGE" > /dev/null
+	        curl -s -X POST --max-time $TIMEOUT $TELEGRAM_URL -d "chat_id=$TELEGRAM_USER_CHAT_ID" -d text="$CONTENT_MESSENGE" > /dev/null
 
-	        sudo rm $TMPFILE
+	        rm $TMPFILE
 	    else
 		# Define for IP public
 	        TEXT=$(echo -e "Date Time: $DATE_EXEC\nNew remote SSH connection.\nUser Login: ${USER} \nServer Login: $HOSTNAME ($IPADDR) \nPort Login: $PORT\nAddress: from $IP - $ORG - $CITY, $REGION, $COUNTRY")
 
-	        sudo curl -s -X POST --max-time $TIMEOUT $TELEGRAM_URL -d "chat_id=$TELEGRAM_USER_CHAT_ID" -d text="$CONTENT_MESSENGE" > /dev/null
+	        curl -s -X POST --max-time $TIMEOUT $TELEGRAM_URL -d "chat_id=$TELEGRAM_USER_CHAT_ID" -d text="$CONTENT_MESSENGE" > /dev/null
 
-	        sudo rm $TMPFILE
+	        rm $TMPFILE
 	    fi
 	fi
 fi
