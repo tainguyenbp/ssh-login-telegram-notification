@@ -13,6 +13,8 @@
 * Setup on CentOS via scipt<br>
 > git clone https://github.com/tainguyenbp/ssh-login-telegram-notification.git<br>
 > cd ssh-login-telegram-notification && ./install-ssh-login-telegram-notification.sh<br>
+* /usr/bin/curl: Cron error : Permission denied ? Check the permission of /usr/bin/curl it should be 755 if its correct then check the script files permission
+> chmod 755 /usr/bin/curl
 * Reference:<br>
 > https://news.cloud365.vn/script-3-giam-sat-truy-cap-ssh-vao-he-thong
 
