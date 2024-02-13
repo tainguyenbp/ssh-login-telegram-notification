@@ -1,63 +1,35 @@
 #!/bin/bash
 
+# Telegram configuration
 TELEGRAM_USER_CHAT_ID="-123456789"
-
 TELEGRAM_TOKEN="9876543210:JNRyjED7a5RB4eDxYVmfbwDuZA2WsPk8AUgU2L"
-
 TIMEOUT="10"
-
 TELEGRAM_URL="https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage"
 
-YEAR="$(date +"%Y")"
-MONTH=$(date +"%m")
-DAY=$(date +"%d")
+# Get current date and time
+DATE_EXEC=$(date +"%H:%M:%S %d/%m/%Y")
 
-HOUR=$(date +"%H")
-MUNITES=$(date +"%M")
-SECOND=$(date +"%S")
-
-DATE_EXEC="$HOUR:$MUNITES:$SECOND $DAY/$MONTH/$YEAR"
-
-# Foler temp
-PATH_TMPFOLDER="$HOME/.tmp"
-mkdir -p $PATH_TMPFOLDER
-
-# File temp
-TMPFILE="$PATH_TMPFOLDER/ipinfo.txt"
-
-if [ "tainguyenbp" == "$USER" ] || [ "nntai" == "$USER" ]; then
-# Add-user script not working
-	break
-else
+# Check for authorized users
+AUTHORIZED_USERS=("sysadmin" "nntai")
+if [[ ! " ${AUTHORIZED_USERS[@]} " =~ " ${USER} " ]]; then
+	# Get SSH client details
 	if [ -n "$SSH_CLIENT" ]; then
-	    IP=$(echo $SSH_CLIENT | awk '{print $1}')
-	    PORT=$(echo $SSH_CLIENT | awk '{print $3}')
-	    HOSTNAME=$(hostname -f)
-    	    IPADDR=$(echo $SSH_CONNECTION | awk '{print $3}')
+		IP=$(echo "$SSH_CLIENT" | awk '{print $1}')
+		PORT=$(echo "$SSH_CLIENT" | awk '{print $3}')
+		HOSTNAME=$(hostname -f)
+		IPADDR=$(echo "$SSH_CONNECTION" | awk '{print $3}')
 
-	    sudo curl http://ipinfo.io/$IP -s -o $TMPFILE
-	    CITY=$(cat $TMPFILE | jq '.city' | sed 's/"//g')
-	    REGION=$(cat $TMPFILE | jq '.region' | sed 's/"//g')
-	    COUNTRY=$(cat $TMPFILE | jq '.country' | sed 's/"//g')
-	    ORG=$(cat $TMPFILE | jq '.org' | sed 's/"//g')
-	    if [ "null" == "$CITY" ] || [ "null" == "$REGION" ] || [ "null" == "$COUNTRY" ] || [ "null" == "$ORG" ]; then
-		# Define for IP local 
-        	CITY="Ho Chi Minh"
-	        REGION="Viet Nam"
-        	COUNTRY="IDC Local"
-	        ORG="210 Cach Mang Thang 8"
-	        CONTENT_MESSENGE=$(echo -e "Date Time: $DATE_EXEC\nNew remote SSH connection.\nUser Login: ${USER} \nServer Login: $HOSTNAME ($IPADDR) \nPort Login: $PORT\nAddress: from $IP - $ORG - $CITY, $REGION, $COUNTRY")
+		# Get location details
+		json=$(curl -s "https://ipinfo.io/$IP/json")
+		CITY=$(jq -r '.city' <<<"$json")
+		REGION=$(jq -r '.region' <<<"$json")
+		COUNTRY=$(jq -r '.country' <<<"$json")
+		ORG=$(jq -r '.org' <<<"$json")
 
-	        curl -s -X POST --max-time $TIMEOUT $TELEGRAM_URL -d "chat_id=$TELEGRAM_USER_CHAT_ID" -d text="$CONTENT_MESSENGE" > /dev/null
+		# Compose message content
+		CONTENT_MESSAGE=$(printf "Date Time: %s\nNew remote SSH connection.\nUser Login: %s\nServer Login: %s (%s)\nPort Login: %s\nAddress: from %s - %s - %s, %s, %s" "$DATE_EXEC" "$USER" "$HOSTNAME" "$IPADDR" "$PORT" "$IP" "$ORG" "$CITY" "$REGION" "$COUNTRY")
 
-	        rm -rf $PATH_TMPFOLDER
-	    else
-		# Define for IP public
-	        TEXT=$(echo -e "Date Time: $DATE_EXEC\nNew remote SSH connection.\nUser Login: ${USER} \nServer Login: $HOSTNAME ($IPADDR) \nPort Login: $PORT\nAddress: from $IP - $ORG - $CITY, $REGION, $COUNTRY")
-
-	        curl -s -X POST --max-time $TIMEOUT $TELEGRAM_URL -d "chat_id=$TELEGRAM_USER_CHAT_ID" -d text="$CONTENT_MESSENGE" > /dev/null
-
-	        rm -rf $PATH_TMPFOLDER
-	    fi
+		# Send message to Telegram
+		curl -s -X POST --max-time $TIMEOUT $TELEGRAM_URL -d "chat_id=$TELEGRAM_USER_CHAT_ID" -d text="$CONTENT_MESSAGE" >/dev/null
 	fi
 fi
